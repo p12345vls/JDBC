@@ -1,0 +1,94 @@
+ /* 1.List all city information for cities with a population greater than 1 million.*/
+SELECT * FROM   city 
+WHERE  population > 1000000; 
+
+/* 2. List the country codes of countries that have cities with a population greater than 1 million.*/
+SELECT DISTINCT country.code 
+FROM   country, city 
+WHERE  city.country = country.code 
+AND city.population > 1000000; 
+
+/* 3. For each country, list the city (or cities) with the largest population.  */
+SELECT country.NAME, 
+city.province, 
+city.NAME, 
+city.population 
+FROM   city 
+JOIN country 
+ON country = country.code 
+WHERE  city.population = (SELECT Max(population) 
+FROM   city 
+WHERE  country = country.code) 
+ORDER  BY country.NAME; 
+
+/* 4. For each country, list its population and the total population of all neighboring countries Select the country code of the country followed by its population, followed by the total population of all neighboring countries (and if it has no neighboring countries, NULL). */
+SELECT country, 
+Max(population) 
+FROM   countrypops 
+GROUP  BY 1 
+ORDER  BY 1 ;
+
+/* 5. List countries having a border with another country.*/
+SELECT country1 AS countries_with_borders 
+FROM   borders 
+UNION 
+SELECT country2 
+FROM   borders 
+ORDER  BY 1; 
+
+/* 6. List countries having at least two borders with another country.*/
+SELECT countries, 
+Count(countries) AS have_borders 
+FROM   (SELECT country1 AS countries 
+FROM   borders 
+UNION ALL 
+SELECT country2 
+FROM   borders) t 
+WHERE  countries IS NOT NULL 
+GROUP  BY countries 
+HAVING Count(countries) >= 2 
+ORDER  BY countries; 
+
+/* 7. List countries having no border with another country*/
+SELECT code AS countries_with_no_borders 
+FROM   country 
+EXCEPT 
+SELECT country2 
+FROM   borders 
+EXCEPT 
+SELECT country1 
+FROM   borders 
+ORDER  BY 1; 
+
+/* 8. List all countries in Europe or Asia.*/
+SELECT country
+FROM encompasses
+WHERE continent = 'Asia'
+ORDER BY 1;
+
+/* 9. List all countries that are located in both Europe and Asia.*/
+SELECT country 
+FROM   encompasses 
+WHERE  country IN (SELECT country 
+FROM   country 
+WHERE  continent = 'Europe') 
+AND country IN (SELECT country 
+FROM   encompasses 
+WHERE  continent = 'Asia'); 
+
+/* 10. Find the city (or cities) with the largest population.*/
+SELECT city.NAME, 
+city.population 
+FROM   city 
+WHERE  population IS NOT NULL 
+AND population >= ALL (SELECT population 
+FROM   city 
+WHERE  population IS NOT NULL);
+
+/* 11. List all religions with the percentage of followers world wide. */
+SELECT NAME AS religion, 
+Round (Sum (percentage) / (SELECT Count(DISTINCT country) 
+FROM   religion), 2) AS followers 
+FROM   religion 
+GROUP  BY 1 
+ORDER  BY 1;

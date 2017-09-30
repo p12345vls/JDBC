@@ -1,0 +1,225 @@
+CREATE TYPE geocoord AS (
+	latitude numeric,
+	longitude numeric
+);
+CREATE TABLE borders (
+    country1 character varying(4) NOT NULL,
+    country2 character varying(4) NOT NULL,
+    length numeric,
+    CONSTRAINT borders_length_check CHECK ((length > (0)::numeric))
+);
+CREATE TABLE city (
+    name character varying(50) NOT NULL,
+    country character varying(4) NOT NULL,
+    province character varying(50) NOT NULL,
+    population numeric,
+    latitude numeric,
+    longitude numeric,
+    elevation numeric,
+    CONSTRAINT citylat CHECK (((latitude >= ('-90'::integer)::numeric) AND (latitude <= (90)::numeric))),
+    CONSTRAINT citylon CHECK (((longitude >= ('-180'::integer)::numeric) AND (longitude <= (180)::numeric))),
+    CONSTRAINT citypop CHECK ((population >= (0)::numeric))
+);
+CREATE TABLE citypops (
+    city character varying(50) NOT NULL,
+    country character varying(4) NOT NULL,
+    province character varying(50) NOT NULL,
+    year numeric NOT NULL,
+    population numeric,
+    CONSTRAINT citypopspop CHECK ((population >= (0)::numeric)),
+    CONSTRAINT citypopsyear CHECK ((year >= (0)::numeric))
+);
+CREATE TABLE continent (
+    name character varying(20) NOT NULL,
+    area numeric(10,0)
+);
+CREATE TABLE country (
+    name character varying(40) NOT NULL,
+    code character(4) NOT NULL,
+    capital character varying(40),
+    province character varying(40),
+    population numeric,
+    area numeric,
+    CONSTRAINT country_area_check CHECK (((area)::double precision >= (0)::double precision)),
+    CONSTRAINT country_population_check CHECK ((population >= (0)::numeric))
+);
+CREATE TABLE countrypops (
+    country character varying(4) NOT NULL,
+    year numeric NOT NULL,
+    population numeric,
+    CONSTRAINT countrypopspop CHECK ((population >= (0)::numeric)),
+    CONSTRAINT countrypopsyear CHECK ((year >= (0)::numeric))
+);
+CREATE TABLE desert (
+    name character varying(50) NOT NULL,
+    area numeric,
+    coordinates geocoord,
+    CONSTRAINT descoord CHECK ((((coordinates).latitude >= ('-90'::integer)::numeric) AND ((coordinates).latitude <= (90)::numeric) AND ((coordinates).longitude > ('-180'::integer)::numeric) AND ((coordinates).longitude <= (180)::numeric)))
+);
+CREATE TABLE economy (
+    country character varying(4) NOT NULL,
+    gdp numeric,
+    agriculture numeric,
+    service numeric,
+    industry numeric,
+    inflation numeric,
+    unemployment numeric,
+    CONSTRAINT economygdp CHECK ((gdp >= (0)::numeric))
+);
+CREATE TABLE encompasses (
+    country character varying(4) NOT NULL,
+    continent character varying(20) NOT NULL,
+    percentage numeric,
+    CONSTRAINT encompasses_percentage_check CHECK (((percentage > (0)::numeric) AND (percentage <= (100)::numeric)))
+);
+CREATE TABLE ethnicgroup (
+    country character varying(4) NOT NULL,
+    name character varying(50) NOT NULL,
+    percentage numeric,
+    CONSTRAINT ethnicpercent CHECK (((percentage > (0)::numeric) AND (percentage <= (100)::numeric)))
+);
+CREATE TABLE geo_mountain (
+    mountain character varying(50) NOT NULL,
+    country character varying(4) NOT NULL,
+    province character varying(50) NOT NULL
+);
+CREATE TABLE island (
+    name character varying(50) NOT NULL,
+    islands character varying(50),
+    area numeric,
+    elevation numeric,
+    type character varying(10),
+    coordinates geocoord,
+    CONSTRAINT islandar CHECK ((area >= (0)::numeric)),
+    CONSTRAINT islandcoord CHECK ((((coordinates).latitude >= ('-90'::integer)::numeric) AND ((coordinates).latitude <= (90)::numeric) AND ((coordinates).longitude > ('-180'::integer)::numeric) AND ((coordinates).longitude <= (180)::numeric)))
+);
+CREATE TABLE islandin (
+    island character varying(50),
+    sea character varying(50),
+    lake character varying(50),
+    river character varying(50)
+);
+CREATE TABLE ismember (
+    country character varying(4) NOT NULL,
+    organization character varying(12) NOT NULL,
+    type character varying(60) DEFAULT 'member'::character varying
+);
+CREATE TABLE lake (
+    name character varying(50) NOT NULL,
+    area numeric,
+    depth numeric,
+    elevation numeric,
+    type character varying(12),
+    river character varying(50),
+    coordinates geocoord,
+    CONSTRAINT lakear CHECK ((area >= (0)::numeric)),
+    CONSTRAINT lakecoord CHECK ((((coordinates).latitude >= ('-90'::integer)::numeric) AND ((coordinates).latitude <= (90)::numeric) AND ((coordinates).longitude > ('-180'::integer)::numeric) AND ((coordinates).longitude <= (180)::numeric))),
+    CONSTRAINT lakedpth CHECK ((depth >= (0)::numeric))
+);
+CREATE TABLE language (
+    country character varying(4) NOT NULL,
+    name character varying(50) NOT NULL,
+    percentage numeric,
+    CONSTRAINT languagepercent CHECK (((percentage > (0)::numeric) AND (percentage <= (100)::numeric)))
+);
+CREATE TABLE located (
+    city character varying(50),
+    province character varying(50),
+    country character varying(4),
+    river character varying(50),
+    lake character varying(50),
+    sea character varying(50)
+);
+CREATE TABLE locatedon (
+    city character varying(50) NOT NULL,
+    province character varying(50) NOT NULL,
+    country character varying(4) NOT NULL,
+    island character varying(50) NOT NULL
+);
+CREATE TABLE mergeswith (
+    sea1 character varying(50) NOT NULL,
+    sea2 character varying(50) NOT NULL
+);
+CREATE TABLE mountain (
+    name character varying(50) NOT NULL,
+    mountains character varying(50),
+    elevation numeric,
+    type character varying(10),
+    coordinates geocoord,
+    CONSTRAINT mountaincoord CHECK ((((coordinates).latitude >= ('-90'::integer)::numeric) AND ((coordinates).latitude <= (90)::numeric) AND ((coordinates).longitude > ('-180'::integer)::numeric) AND ((coordinates).longitude <= (180)::numeric)))
+);
+CREATE TABLE mountainonisland (
+    mountain character varying(50) NOT NULL,
+    island character varying(50) NOT NULL
+);
+CREATE TABLE organization (
+    abbreviation character varying(12) NOT NULL,
+    name character varying(100) NOT NULL,
+    city character varying(50),
+    country character varying(4),
+    province character varying(50),
+    established date
+);
+CREATE TABLE politics (
+    country character varying(4) NOT NULL,
+    independence date,
+    wasdependent character varying(50),
+    dependent character varying(4),
+    government character varying(120)
+);
+CREATE TABLE population (
+    country character varying(4) NOT NULL,
+    population_growth numeric,
+    infant_mortality numeric
+);
+CREATE TABLE province (
+    name character varying(50) NOT NULL,
+    country character varying(4) NOT NULL,
+    population numeric,
+    area numeric,
+    capital character varying(50),
+    capprov character varying(50),
+    CONSTRAINT prar CHECK ((area >= (0)::numeric)),
+    CONSTRAINT prpop CHECK ((population >= (0)::numeric))
+);
+CREATE TABLE provpops (
+    province character varying(50) NOT NULL,
+    country character varying(4) NOT NULL,
+    year numeric NOT NULL,
+    population numeric,
+    CONSTRAINT provpopspop CHECK ((population >= (0)::numeric)),
+    CONSTRAINT provpopsyear CHECK ((year >= (0)::numeric))
+);
+CREATE TABLE religion (
+    country character varying(4) NOT NULL,
+    name character varying(50) NOT NULL,
+    percentage numeric,
+    CONSTRAINT religionpercent CHECK (((percentage > (0)::numeric) AND (percentage <= (100)::numeric)))
+);
+CREATE TABLE river (
+    name character varying(50) NOT NULL,
+    river character varying(50),
+    lake character varying(50),
+    sea character varying(50),
+    length numeric,
+    area numeric,
+    source geocoord,
+    mountains character varying(50),
+    sourceelevation numeric,
+    estuary geocoord,
+    estuaryelevation numeric,
+    CONSTRAINT estcoord CHECK ((((estuary).latitude >= ('-90'::integer)::numeric) AND ((estuary).latitude <= (90)::numeric) AND ((estuary).longitude > ('-180'::integer)::numeric) AND ((estuary).longitude <= (180)::numeric))),
+    CONSTRAINT riverarea CHECK ((area >= (0)::numeric)),
+    CONSTRAINT riverlength CHECK ((length >= (0)::numeric)),
+    CONSTRAINT rivflowsinto CHECK ((((river IS NULL) AND (lake IS NULL)) OR ((river IS NULL) AND (sea IS NULL)) OR ((lake IS NULL) AND (sea IS NULL)))),
+    CONSTRAINT sourcecoord CHECK ((((source).latitude >= ('-90'::integer)::numeric) AND ((source).latitude <= (90)::numeric) AND ((source).longitude > ('-180'::integer)::numeric) AND ((source).longitude <= (180)::numeric)))
+);
+CREATE TABLE riverthrough (
+    river character varying(50) NOT NULL,
+    lake character varying(50) NOT NULL
+);
+CREATE TABLE sea (
+    name character varying(50) NOT NULL,
+    depth numeric,
+    CONSTRAINT seadepth CHECK ((depth >= (0)::numeric))
+);
